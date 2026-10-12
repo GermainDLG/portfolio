@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Harmony — Grader (Recommended)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="topbar-title">
+        <span class="logo">⇄</span>
+        <div>
+          <div class="app-name">Data Harmony</div>
+          <div class="app-sub">Grader · MIMIC-III → OMOP · Weekly batch — Jul 6, 2026</div>
+        </div>
+      </div>
+      <div class="topbar-progress" id="grader-progress">
+        <!-- own progress fraction, filled by JS -->
+      </div>
+      <button class="schedule-btn" id="edit-schedule-btn" title="Update your free/busy availability">
+        📅 Edit Schedule
+      </button>
+    </header>
+
+    <div class="main">
+
+      <!-- Left sidebar: queue + action box -->
+      <aside class="sidebar">
+
+        <div class="queue-header">
+          <span class="queue-title">Pairings</span>
+          <span class="badge" id="queue-count">0</span>
+          <span class="queue-hint" id="bulk-hint"></span>
+        </div>
+
+        <ul class="queue" id="queue-list"></ul>
+
+        <!-- Action box (commit-box position) -->
+        <div class="action-box" id="action-box">
+
+          <!-- Bulk banner, hidden in single mode -->
+          <div class="bulk-banner hidden" id="bulk-banner">
+            Bulk mode — <span id="bulk-count">0</span> pairings selected
+          </div>
+
+          <div class="action-row">
+            <select id="verdict-select" class="verdict-select" title="Verdict"></select>
+          </div>
+
+          <!-- Reassign fields -->
+          <div class="subform hidden" id="reassign-form">
+            <label class="field-label">Reassign to canonical</label>
+            <div class="field-row">
+              <select id="reassign-table"></select>
+              <select id="reassign-column"></select>
+            </div>
+          </div>
+
+          <!-- Expand mini-form (replaces message box when Expand selected) -->
+          <div class="subform hidden" id="expand-form">
+            <label class="field-label">Schema expansion</label>
+            <div class="radio-row">
+              <label><input type="radio" name="expand-kind" value="table" checked> New table</label>
+              <label><input type="radio" name="expand-kind" value="column"> New column</label>
+            </div>
+            <div id="expand-table-fields">
+              <input type="text" id="expand-table-name" placeholder="New table name">
+            </div>
+            <div id="expand-column-fields" class="hidden">
+              <select id="expand-target-table"></select>
+            </div>
+            <div class="expand-columns" id="expand-columns">
+              <!-- column rows injected by JS -->
+            </div>
+            <button class="mini-btn" id="add-column-btn" type="button">+ Add column</button>
+            <textarea id="expand-reason" class="message-box small" placeholder="Reason (required)"></textarea>
+          </div>
+
+          <!-- Message box: optional for accept/reject/reassign, required for assign-none -->
+          <textarea id="verdict-message" class="message-box"
+                    placeholder="Message (optional)"></textarea>
+
+          <div class="error hidden" id="action-error"></div>
+
+          <button class="submit-btn" id="submit-btn">Accept</button>
+        </div>
+      </aside>
+
+      <!-- Right detail panel (independently scrollable) -->
+      <section class="detail-wrap">
+        <div class="detail" id="detail-panel"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Bulk confirmation modal -->
+  <div class="modal-overlay hidden" id="bulk-modal">
+    <div class="modal">
+      <div class="modal-title" id="bulk-modal-title">Confirm bulk action</div>
+      <div class="modal-body">
+        <p id="bulk-modal-text"></p>
+        <ul class="modal-list" id="bulk-modal-list"></ul>
+      </div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="bulk-cancel">Cancel</button>
+        <button class="btn primary" id="bulk-confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekly availability (When2Meet-style) -->
+  <div class="modal-overlay hidden" id="schedule-modal">
+    <div class="modal sched-modal">
+      <div class="modal-title">Your availability this week</div>
+      <div class="modal-body">
+        <p class="sched-hint">
+          Click or drag to mark the times you are <strong>free</strong> (green).
+          Unmarked boxes are treated as busy. Mon–Fri, 9:00 AM–5:00 PM, half-hour blocks.
+          No event details are shared — only free/busy.
+        </p>
+        <div class="sched-grid" id="schedule-grid"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="schedule-skip">Skip for now</button>
+        <button class="btn primary" id="schedule-save">Save schedule</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Undo toast -->
+  <div class="toast hidden" id="undo-toast">
+    <span id="toast-text"></span>
+    <button class="toast-undo" id="toast-undo-btn">Undo</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+.env
+token.json
+credentials.json
+digest.db
+digest.log
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+newsletter-filter/
+bootstrap_gmail.py

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quicksilver Labs Newsletter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+        <h1 class="site-title">Quicksilver Labs <span>Newsletter</span></h1>
+        <div class="header-actions">
+            <button id="btn-start" class="btn btn-secondary">Start Search</button>
+            <button id="btn-reset" class="btn btn-secondary"{% if not reset_available %} hidden{% endif %}>Reset Search</button>
+            <button id="btn-send" class="btn btn-primary" disabled>Create Doc</button>
+            <a href="{{ url_for('archive') }}" class="btn btn-secondary">Archive</a>
+        </div>
+    </div>
+</header>
+
+<!-- Sources Tracker Sidebar -->
+<aside id="sources-sidebar" class="sources-sidebar">
+    <div class="sources-header">
+        <h2 class="sources-title">Sources <span class="badge">{{ source_counts | length }}</span></h2>
+        <button id="sources-toggle" class="sidebar-toggle" title="Collapse" aria-label="Toggle sources panel">›</button>
+    </div>
+    <ul class="source-list" id="source-list">
+        {% for s in source_counts %}
+        <li class="source-row" data-source="{{ s.source }}">
+            <span class="source-name" title="{{ s.source }}">{{ s.source }}</span>
+            <span class="badge source-count">{{ s.count }}</span>
+        </li>
+        {% endfor %}
+        <li class="empty-msg"{% if source_counts %} hidden{% endif %}>No articles on the page.</li>
+    </ul>
+</aside>
+
+<main class="main-content">
+
+    <!-- Topic Management -->
+    <div class="topics-bar card">
+        <span class="filter-label">Topics</span>
+        <div id="topic-chips" class="filter-chips">
+            {% for topic in topics %}
+            <span class="chip topic-chip" data-topic-id="{{ topic.id }}" data-topic-name="{{ topic.name }}">
+                <span class="topic-chip-name">{{ topic.name }}</span>
+                <button class="chip-delete" title="Delete topic" aria-label="Delete topic">✕</button>
+            </span>
+            {% endfor %}
+        </div>
+        <button id="btn-add-topic" class="chip chip-add" title="Add topic" aria-label="Add topic">+</button>
+    </div>
+
+    <!-- Articles Section -->
+    {% macro article_card(article) %}
+    <article class="article-card" data-score="{{ article.relevance_score }}" data-id="{{ article.id }}" data-category="{{ article.category }}" data-source="{{ article.source }}">
+        <div class="card-top">
+            <div class="card-tags">
+                <span class="tag {% if article.category == 'specific' %}tag-specific{% else %}tag-general{% endif %}">
+                    {{ article.category | capitalize }}
+                </span>
+                <span class="tag tag-score">
+                    {{ article.relevance_score | int }}
+                </span>
+            </div>
+            <div class="card-actions">
+                <button class="action-btn accept-btn" title="Accept">✓</button>
+                <button class="action-btn reject-btn" title="Reject">✗</button>
+            </div>
+        </div>
+        <h3 class="card-title">
+            <a href="{{ article.url }}" target="_blank" rel="noopener">{{ article.headline }}</a>
+        </h3>
+        <p class="card-summary">{{ article.summary }}</p>
+        <span class="card-source">{{ article.source }}</span>
+    </article>
+    {% endmacro %}
+
+    <!-- Topic Buckets -->
+    {% for bucket in buckets if bucket.name != 'Other' %}
+    <section class="panel" data-topic-name="{{ bucket.name }}">
+        <div class="panel-header collapsible" data-target="bucket-list-{{ loop.index }}">
+            <h2>{{ bucket.name }} <span class="badge bucket-count">{{ bucket.articles | length }}</span></h2>
+            <span class="chevron">▾</span>
+        </div>
+        <div class="article-grid bucket-list" id="bucket-list-{{ loop.index }}">
+            {% for article in bucket.articles %}{{ article_card(article) }}{% endfor %}
+            <p class="empty-msg"{% if bucket.articles %} hidden{% endif %}>No articles in this bucket.</p>
+        </div>
+    </section>
+    {% endfor %}
+
+    <!-- Other Bucket (always shown) -->
+    {% for bucket in buckets if bucket.name == 'Other' %}
+    <section class="panel">
+        <div class="panel-header collapsible" data-target="bucket-list-other">
+            <h2>Other <span class="badge bucket-count">{{ bucket.articles | length }}</span></h2>
+            <span class="chevron">▾</span>
+        </div>
+        <div class="article-grid bucket-list" id="bucket-list-other">
+            {% for article in bucket.articles %}{{ article_card(article) }}{% endfor %}
+            <p class="empty-msg"{% if bucket.articles %} hidden{% endif %}>No articles in this bucket.</p>
+        </div>
+    </section>
+    {% endfor %}
+
+    <!-- Manual Review Section (paywalled articles) -->
+    <section class="panel" id="panel-manual">
+        <div class="panel-header collapsible" data-target="manual-list">
+            <h2>Manual Review & One-Liners <span class="badge" id="count-manual">{{ manual_articles | length }}</span></h2>
+            <span class="chevron">▾</span>
+        </div>
+        <div class="article-grid" id="manual-list">
+            {% for article in manual_articles %}
+            <article    class="article-card"
+                        data-id="{{ article.id }}"
+                        data-category="general"
+                        data-topics=""
+                        data-score="{{ article.relevance_score }}"
+                        data-source="{{ article.source }}">
+                <div class="card-top">
+                    <div class="card-tags">
+                        <span class="tag tag-general">Manual Review</span>
+                        <span class="tag tag-score">{{ article.relevance_score | int }}</span>
+                    </div>
+                    <div class="card-actions">
+                        <button class="action-btn accept-btn" title="Accept">✓</button>
+                        <button class="action-btn reject-btn" title="Reject">✗</button>
+                    </div>
+                </div>
+                <h3 class="card-title">
+                    <a href="{{ article.url }}" target="_blank" rel="noopener">
+                        {{ article.headline }}
+                    </a>
+                </h3>
+                <span class="card-source">{{ article.source }}</span>
+            </article>
+            {% endfor %}
+        </div>
+        <p class="empty-msg" {% if manual_articles %}hidden{% endif %}>No manual articles to review.</p>
+    </section>
+
+    <!-- Extra Section (scored not relevant) -->
+    <section class="panel" id="panel-extra">
+        <div class="panel-header collapsible" data-target="extra-list">
+            <h2>Extra <span class="badge" id="count-extra">{{ extra_articles | length }}</span></h2>
+            <span class="chevron">▾</span>
+        </div>
+        <ul class="review-list" id="extra-list">
+            {% for article in extra_articles %}
+            <li class="review-item"
+                data-id="{{ article.id }}"
+                data-score="{{ article.relevance_score }}"
+                data-title="{{ article.headline }}"
+                data-href="{{ article.url }}"
+                data-source="{{ article.source }}">
+                <span class="tag tag-score">{{ article.relevance_score | int }}</span>
+                <a href="{{ article.url }}" target="_blank" rel="noopener">{{ article.headline }}</a>
+                <button class="action-btn accept-btn" title="Move to Accepted">✓</button>
+                <button class="action-btn reject-btn" title="Move to Rejected">✗</button>
+            </li>
+            {% else %}
+            <li class="empty-msg">No extra articles from the last search</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <!-- Accepted Section -->
+    <section class="panel panel-accepted" id="panel-accepted">
+        <div class="panel-header collapsible" data-target="accepted-list">
+            <h2>Accepted <span class="badge badge-accepted" id="count-accepted">{{ confirmed_articles | length }}</span></h2>
+            <span class="chevron">▾</span>
+        </div>
+        <ul class="review-list" id="accepted-list">
+            {% for article in confirmed_articles %}
+            <li class="review-item"
+                data-score="{{ article.relevance_score }}"
+                data-top-news-state="{{ article.top_news_state }}"
+                data-id="{{ article.id }}"
+                data-title="{{ article.headline }}"
+                data-href="{{ article.url }}"
+                data-source="{{ article.source }}">
+                <span class="tag tag-score">{{ article.relevance_score | int }}</span>
+                <a href="{{ article.url }}" target="_blank" rel="noopener">{{ article.headline }}</a>
+                <button class="action-btn pin-btn{% if article.top_news_state == 'pinned' %} active{% endif %}" title="Pin to Top News">★</button>
+                <button class="action-btn reject-btn" title="Move to Rejected">✗</button>
+            </li>
+            {% else %}
+            <li class="empty-msg">No articles accepted yet</li>
+            {% endfor %}
+        </ul>
+</section>
+
+    <!-- Rejected Section -->
+    <section class="panel panel-rejected" id="panel-rejected">
+        <div class="panel-header collapsible" data-target="rejected-list">
+            <h2>Rejected <span class="badge badge-rejected" id="count-rejected">{{ denied_articles | length }}</span></h2>
+            <span class="chevron">▾</span>
+        </div>
+        <ul class="review-list" id="rejected-list">
+            {% for article in denied_articles %}
+            <li class="review-item"
+                data-score="{{ article.relevance_score }}"
+                data-id="{{ article.id }}"
+                data-title="{{ article.headline }}"
+                data-href="{{ article.url }}"
+                data-source="{{ article.source }}">
+                <span class="tag tag-score">{{ article.relevance_score | int }}</span>
+                <a href="{{ article.url }}" target="_blank" rel="noopener">{{ article.headline }}</a>
+                <button class="action-btn accept-btn" title="Move to Accepted">✓</button>
+            </li>
+            {% else %}
+            <li class="empty-msg">No articles rejected yet</li>
+            {% endfor %}
+        </ul>
+</section>
+
+</main>
+
+<!-- Add Topic Modal -->
+<div id="topic-modal" class="modal-overlay" hidden>
+    <div class="modal">
+        <h2 class="modal-title">New Topic</h2>
+        <label class="modal-label" for="topic-name-input">Name</label>
+        <input type="text" id="topic-name-input" class="modal-input" maxlength="80" autocomplete="off">
+        <label class="modal-label" for="topic-desc-input">Description</label>
+        <textarea id="topic-desc-input" class="modal-textarea" rows="3"></textarea>
+        <p class="modal-error" id="topic-modal-error" hidden></p>
+        <div class="modal-actions">
+            <button id="topic-modal-cancel" class="btn btn-secondary">Cancel</button>
+            <button id="topic-modal-add" class="btn btn-primary">Add Topic</button>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

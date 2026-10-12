@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Harmony — Admin (Table vs Column)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+
+    <!-- Top bar: manage graders (left) + per-grader progress bars -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-title">
+          <span class="logo">⇄</span>
+          <div>
+            <div class="app-name">Data Harmony</div>
+          </div>
+        </div>
+        <button class="manage-graders-btn" id="manage-graders-btn">
+          <span class="icon">👤+</span> Manage graders
+        </button>
+        <!-- View toggles: Column | Table, then Input | Canonical -->
+        <div class="view-toggles">
+          <div class="view-toggle" id="view-toggle">
+            <button data-view="column" class="active">Column</button>
+            <button data-view="table">Table</button>
+          </div>
+          <div class="view-toggle hidden" id="side-toggle">
+            <button data-side="input" class="active">Input</button>
+            <button data-side="canonical">Canonical</button>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="grader-progress-row" id="grader-progress-row">
+          <!-- one bar per grader, filled by JS -->
+        </div>
+        <button class="lock-btn" id="lock-decisions-btn" title="Permanently lock every decision made so far">🔒 Lock Decisions</button>
+        <button class="schedule-btn" id="reset-demo-btn" title="Clear all demo state and start over">↺ Reset Demo</button>
+        <a class="schedule-btn switch-btn" href="../grader-flow/index.html" title="Open the grader dashboard">⇄ Grader</a>
+      </div>
+    </header>
+
+    <div class="main">
+
+      <!-- Left sidebar: tabs + queue + action box -->
+      <aside class="sidebar">
+
+        <!-- Radio-style tab toggle with count badges -->
+        <div class="tabs" id="tabs">
+          <button class="tab active" data-tab="matches">
+            Match Decisions <span class="badge" id="matches-count">0</span>
+          </button>
+          <button class="tab" data-tab="expansions">
+            Schema Expansions <span class="badge" id="expansions-count">0</span>
+          </button>
+        </div>
+
+        <ul class="queue" id="queue-list"></ul>
+
+        <!-- Action box -->
+        <div class="action-box" id="action-box">
+
+          <div class="bulk-banner hidden" id="bulk-banner">
+            Bulk mode — <span id="bulk-count">0</span> pairings selected
+          </div>
+
+          <div class="under-review-warning hidden" id="under-review-warning">
+            ⚠ This pairing has fewer than 3 grader reviews.
+          </div>
+
+          <div class="locked-note hidden" id="locked-note">
+            🔒 Decisions are locked — this decision can no longer be changed.
+          </div>
+
+          <!-- Match-decision controls -->
+          <div id="match-controls">
+            <!-- In Table view, names the pairing the action box targets -->
+            <div class="acting-on hidden" id="acting-on"></div>
+            <div class="action-row">
+              <select id="verdict-select" class="verdict-select" title="Final decision"></select>
+            </div>
+            <div class="subform hidden" id="reassign-form">
+              <label class="field-label">Reassign to canonical</label>
+              <div class="field-row">
+                <select id="reassign-table"></select>
+                <select id="reassign-column"></select>
+              </div>
+            </div>
+            <textarea id="verdict-message" class="message-box" placeholder="Message (optional)"></textarea>
+            <div class="error hidden" id="action-error"></div>
+            <button class="submit-btn" id="submit-btn">Finalize: Accept</button>
+          </div>
+
+          <!-- Expansion controls -->
+          <div id="expansion-controls" class="hidden">
+            <textarea id="expansion-message" class="message-box" placeholder="Message (optional)"></textarea>
+            <div class="button-row">
+              <button class="submit-btn danger half" id="reject-expansion-btn">Reject</button>
+              <button class="submit-btn approve half" id="approve-expansion-btn">Approve</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right detail panel (independently scrollable) -->
+      <section class="detail-wrap">
+        <div class="detail" id="detail-panel"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Bulk confirmation modal -->
+  <div class="modal-overlay hidden" id="bulk-modal">
+    <div class="modal">
+      <div class="modal-title" id="bulk-modal-title">Confirm bulk action</div>
+      <div class="modal-body">
+        <p id="bulk-modal-text"></p>
+        <div class="modal-warning hidden" id="bulk-modal-warning"></div>
+        <ul class="modal-list" id="bulk-modal-list"></ul>
+      </div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="bulk-cancel">Cancel</button>
+        <button class="btn primary" id="bulk-confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manage graders popup -->
+  <div class="modal-overlay hidden" id="graders-modal">
+    <div class="modal">
+      <div class="modal-title">Manage graders</div>
+      <div class="modal-body">
+        <div class="modal-warning hidden" id="graders-warning"></div>
+        <ul class="grader-list" id="grader-list"></ul>
+        <div class="add-grader-row">
+          <input type="email" id="new-grader-email" placeholder="Add grader by email">
+          <button class="btn primary" id="add-grader-btn">Add</button>
+        </div>
+        <div class="grader-cap-note" id="grader-cap-note"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="graders-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Remove-grader confirmation -->
+  <div class="modal-overlay hidden" id="remove-grader-modal">
+    <div class="modal">
+      <div class="modal-title">Remove grader?</div>
+      <div class="modal-body" id="remove-grader-text"></div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="remove-grader-cancel">Cancel</button>
+        <button class="btn danger" id="remove-grader-confirm">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Finalize warning (under-reviewed single item) -->
+  <div class="modal-overlay hidden" id="warn-modal">
+    <div class="modal">
+      <div class="modal-title">Finalize under-reviewed pairing?</div>
+      <div class="modal-body" id="warn-modal-text"></div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="warn-cancel">Cancel</button>
+        <button class="btn primary" id="warn-confirm">Finalize anyway</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lock-decisions confirmation -->
+  <div class="modal-overlay hidden" id="lock-modal">
+    <div class="modal">
+      <div class="modal-title">Lock all decisions?</div>
+      <div class="modal-body">
+        Every match decision and schema-expansion decision made so far becomes
+        permanent and can no longer be revised. Undecided items stay open, and
+        lock as soon as they are decided. This cannot be undone.
+      </div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="lock-cancel">Cancel</button>
+        <button class="btn danger" id="lock-confirm">Lock decisions</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meet: overlay of all graders' availability (When2Meet-style) -->
+  <div class="modal-overlay hidden" id="meet-modal">
+    <div class="modal sched-modal">
+      <div class="modal-title" id="meet-modal-title">Find a meeting time</div>
+      <div class="modal-body">
+        <p class="sched-hint" id="meet-modal-sub"></p>
+        <div class="sched-grid" id="meet-grid"></div>
+        <div class="modal-warning hidden" id="meet-missing"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="meet-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast hidden" id="undo-toast">
+    <span id="toast-text"></span>
+    <button class="toast-undo" id="toast-undo-btn">Undo</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

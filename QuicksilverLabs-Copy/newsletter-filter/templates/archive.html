@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quicksilver Labs Newsletter - Archive</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+        <h1 class="site-title">Quicksilver Labs <span>Newsletter</span></h1>
+        <div class="header-actions">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Dashboard</a>
+        </div>
+    </div>
+</header>
+
+<main class="main-content">
+
+    <div class="archive-intro card">
+        <h2 class="archive-intro-title">Scraper Archive</h2>
+        <p class="archive-intro-sub">The last 3 scraper runs. Select a run to see everything it pulled, grouped by category. A <span class="accepted-mark" aria-hidden="true">✓</span> marks articles that were accepted.</p>
+    </div>
+
+    <!-- Reusable article card (read-only) -->
+    {% macro archive_article(article) %}
+    <article class="article-card{% if article.accepted %} is-accepted{% endif %}"
+             data-score="{{ article.relevance_score }}"
+             data-id="{{ article.id }}"
+             data-category="{{ article.category }}">
+        <div class="card-top">
+            <div class="card-tags">
+                {% if article.accepted %}
+                <span class="accepted-mark" title="Accepted">✓</span>
+                {% endif %}
+                <span class="tag {% if article.category == 'specific' %}tag-specific{% else %}tag-general{% endif %}">
+                    {{ article.category | capitalize }}
+                </span>
+                <span class="tag tag-score">{{ article.relevance_score | int }}</span>
+            </div>
+        </div>
+        <h3 class="card-title">
+            <a href="{{ article.url }}" target="_blank" rel="noopener">{{ article.headline }}</a>
+        </h3>
+        {% if article.summary %}<p class="card-summary">{{ article.summary }}</p>{% endif %}
+        <span class="card-source">{{ article.source }}</span>
+    </article>
+    {% endmacro %}
+
+    <!-- Run list -->
+    <div class="archive-runs">
+        {% for run in runs %}
+        <section class="archive-run panel" data-run-id="{{ run.id }}">
+
+            <!-- Wide run button -->
+            <button class="run-button collapsible" data-target="run-body-{{ loop.index }}" type="button">
+                <span class="run-date">{{ run.date }}</span>
+                <span class="run-meta">
+                    <span class="badge">{{ run.article_count }} scraped</span>
+                    <span class="badge badge-accepted">{{ run.accepted_count }} accepted</span>
+                </span>
+                <span class="chevron">▾</span>
+            </button>
+
+            <!-- Run body: categories with their articles -->
+            <div class="run-body hidden" id="run-body-{{ loop.index }}">
+                {% for category in run.categories %}
+                <div class="run-category">
+                    <div class="run-category-header">
+                        <h3>{{ category.name }}</h3>
+                        <span class="badge">{{ category.articles | length }}</span>
+                    </div>
+                    <div class="article-grid">
+                        {% for article in category.articles %}{{ archive_article(article) }}{% endfor %}
+                        <p class="empty-msg"{% if category.articles %} hidden{% endif %}>No articles in this category.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+        </section>
+        {% else %}
+        <p class="empty-msg">No scraper runs recorded yet.</p>
+        {% endfor %}
+    </div>
+
+</main>
+
+<!-- Placeholder accordion toggle — move to a dedicated archive.js when wiring up the backend -->
+<script>
+document.querySelectorAll('.run-button.collapsible').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        var body = document.getElementById(btn.dataset.target);
+        if (!body) return;
+        body.classList.toggle('hidden');
+        btn.querySelector('.chevron').classList.toggle('up');
+    });
+});
+</script>
+</body>
+</html>

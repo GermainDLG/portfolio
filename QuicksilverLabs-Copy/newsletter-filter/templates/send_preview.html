@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Newsletter — Quicksilver Labs Newsletter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .preview-main {
+            padding: 20px;
+            height: calc(100vh - 80px);
+            box-sizing: border-box;
+        }
+        #digest-frame {
+            width: 100%;
+            height: 100%;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            background: #fff;
+        }
+        .preview-hint {
+            color: #5f6368;
+            font-size: 13px;
+            margin: 0 0 12px;
+        }
+    </style>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+        <h1 class="site-title">Quicksilver Labs <span>Newsletter</span></h1>
+        <div class="header-actions">
+            <button id="btn-cancel-preview" class="btn btn-secondary">Cancel</button>
+            <button id="btn-confirm-send" class="btn btn-primary">Download</button>        </div>
+    </div>
+</header>
+
+<main class="preview-main">
+    <p class="preview-hint">Click into the newsletter below to edit any text before downloading. Downloading the doc archives this cycle — accepted articles clear from the dashboard.</p>
+    <iframe id="digest-frame" title="Newsletter preview" srcdoc="{{ html_body }}"></iframe>
+</main>
+
+<script src="{{ url_for('static', filename='js/send_preview.js') }}"></script>
+</body>
+</html>

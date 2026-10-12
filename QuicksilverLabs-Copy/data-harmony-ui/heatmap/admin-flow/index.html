@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Concordia — Admin (Heatmap)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+
+    <!-- Top bar: manage graders (left) + lock/reset/switch (right) -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-title">
+          <div>
+            <div class="app-name">Concordia</div>
+          </div>
+        </div>
+        <button class="manage-graders-btn" id="manage-graders-btn">
+          <span class="icon">👤+</span> Manage graders
+        </button>
+      </div>
+      <div class="topbar-right">
+        <button class="schedule-btn" id="theme-toggle-btn" title="Switch color theme">☀ Light</button>
+        <button class="lock-btn" id="lock-decisions-btn" title="Permanently lock every decision made so far">🔒 Lock Decisions</button>
+        <button class="schedule-btn" id="reset-demo-btn" title="Clear all demo state and start over">↺ Reset Demo</button>
+        <a class="schedule-btn switch-btn" href="../grader-flow/index.html" title="Open the grader dashboard">⇄ Grader</a>
+      </div>
+    </header>
+
+    <div class="main">
+
+      <!-- Left sidebar: tabs + queue + bulk bar / expansion controls -->
+      <aside class="sidebar">
+
+        <!-- Radio-style tab toggle with count badges -->
+        <div class="tabs" id="tabs">
+          <button class="tab active" data-tab="matches">
+            Match Decisions <span class="badge" id="matches-count">0</span>
+          </button>
+          <button class="tab" data-tab="expansions">
+            Schema Expansions <span class="badge" id="expansions-count">0</span>
+          </button>
+          <div class="tabs-hist">
+            <button class="hist-btn" id="undo-btn" title="Undo" disabled>↺</button>
+            <button class="hist-btn" id="redo-btn" title="Redo" disabled>↻</button>
+          </div>
+        </div>
+
+        <ul class="queue" id="queue-list"></ul>
+
+        <!-- Action box: bulk bar on matches, approve/reject on expansions.
+             Single match decisions live in the popup. -->
+        <div class="action-box hidden" id="action-box">
+
+          <!-- Bulk bar (matches tab): only visible with 2+ selections -->
+          <div id="match-controls">
+            <div class="bulk-banner">Bulk mode — <span id="bulk-count">0</span> pairings selected</div>
+            <button class="submit-btn" id="bulk-continue-btn">Continue</button>
+          </div>
+
+          <!-- Expansion controls -->
+          <div id="expansion-controls" class="hidden">
+            <div class="locked-note hidden" id="locked-note">
+              🔒 Decisions are locked — this decision can no longer be changed.
+            </div>
+            <textarea id="expansion-message" class="message-box" placeholder="Message (optional)"></textarea>
+            <div class="button-row">
+              <button class="submit-btn danger half" id="reject-expansion-btn">Reject</button>
+              <button class="submit-btn approve half" id="approve-expansion-btn">Approve</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right detail panel (independently scrollable): heatmap + reasoning -->
+      <section class="detail-wrap">
+        <div class="detail" id="detail-panel"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Action popup: final-decision dropdown + always-"Submit" -->
+  <div class="modal-overlay hidden" id="action-modal">
+    <div class="modal action-modal">
+      <div class="modal-title" id="action-title">Finalize pairing</div>
+      <div class="modal-body action-modal-body">
+
+        <div class="under-review-warning hidden" id="modal-under-review"></div>
+
+        <div class="action-row">
+          <select id="verdict-select" class="verdict-select" title="Final decision"></select>
+        </div>
+
+        <!-- Bulk mode: the pairings the decision applies to -->
+        <div class="hidden" id="bulk-list-wrap">
+          <p id="bulk-text"></p>
+          <ul class="modal-list" id="bulk-list"></ul>
+        </div>
+
+        <!-- Reassign picker (within the suggested table) -->
+        <div class="hidden" id="reassign-area"></div>
+
+        <!-- Message box: optional except for assign-none -->
+        <textarea id="verdict-message" class="message-box"
+                  placeholder="Message (optional)"></textarea>
+
+        <div class="error hidden" id="action-error"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="action-cancel">Cancel</button>
+        <button class="btn primary" id="action-submit">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manage graders popup -->
+  <div class="modal-overlay hidden" id="graders-modal">
+    <div class="modal">
+      <div class="modal-title">Manage graders</div>
+      <div class="modal-body">
+        <div class="modal-warning hidden" id="graders-warning"></div>
+        <ul class="grader-list" id="grader-list"></ul>
+        <div class="add-grader-row">
+          <input type="email" id="new-grader-email" placeholder="Add grader by email">
+          <button class="btn primary" id="add-grader-btn">Add</button>
+        </div>
+        <div class="grader-cap-note" id="grader-cap-note"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="graders-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Remove-grader confirmation -->
+  <div class="modal-overlay hidden" id="remove-grader-modal">
+    <div class="modal">
+      <div class="modal-title">Remove grader?</div>
+      <div class="modal-body" id="remove-grader-text"></div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="remove-grader-cancel">Cancel</button>
+        <button class="btn danger" id="remove-grader-confirm">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Finalize warning (under-reviewed single item) -->
+  <div class="modal-overlay hidden" id="warn-modal">
+    <div class="modal">
+      <div class="modal-title">Finalize under-reviewed pairing?</div>
+      <div class="modal-body" id="warn-modal-text"></div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="warn-cancel">Cancel</button>
+        <button class="btn primary" id="warn-confirm">Finalize anyway</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lock-decisions confirmation -->
+  <div class="modal-overlay hidden" id="lock-modal">
+    <div class="modal">
+      <div class="modal-title">Lock all decisions?</div>
+      <div class="modal-body">
+        Every match decision and schema-expansion decision made so far becomes
+        permanent and can no longer be revised. Undecided items stay open, and
+        lock as soon as they are decided. This cannot be undone.
+      </div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="lock-cancel">Cancel</button>
+        <button class="btn danger" id="lock-confirm">Lock decisions</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meet: overlay of all graders' availability (When2Meet-style) -->
+  <div class="modal-overlay hidden" id="meet-modal">
+    <div class="modal sched-modal">
+      <div class="modal-title" id="meet-modal-title">Find a meeting time</div>
+      <div class="modal-body">
+        <p class="sched-hint" id="meet-modal-sub"></p>
+        <div class="sched-grid" id="meet-grid"></div>
+        <div class="modal-warning hidden" id="meet-missing"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="meet-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

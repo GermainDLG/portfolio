@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dashboard",
+      "runtimeExecutable": "newsletter-filter/Scripts/python",
+      "runtimeArgs": ["app.py"],
+      "port": 5000
+    },
+    {
+      "name": "send-preview-repro",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8902", "--directory", "C:/Users/davis/AppData/Local/Temp/claude/C--Users-davis-VSCode-Projects-QuicksilverLabs-newsletter-filter/d97ce1b9-9474-4f99-8c28-43552980dbe6/scratchpad/repro"],
+      "port": 8902
+    }
+  ]
+}

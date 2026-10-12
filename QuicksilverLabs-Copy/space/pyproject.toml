@@ -1,0 +1,33 @@
+[project]
+name = "space"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "astropy<7.0",
+    "chronos-forecasting>=2.2.2",
+    "hapsira>=0.18.0",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.7.5",
+    "numpy>=1.26.4",
+    "torch>=2.2,<2.5",
+    "uni2ts>=2.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]

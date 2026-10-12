@@ -1,0 +1,1 @@
+right click, open with live server

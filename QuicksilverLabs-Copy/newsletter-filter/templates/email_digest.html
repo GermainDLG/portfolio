@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Quicksilver Labs Newsletter</title>
+    </head>
+    <body style="margin: 0; padding: 20px; background-color: #f5f5f5;">
+        <div style="max-width: 600px; 
+                    margin: 0 auto; 
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;">
+            <h1 style="font-size: 22px; color: #202124; margin: 0 0 2px;">
+                Quicksilver Labs Newsletter
+            </h1>
+            <div style="color: #5f6368; font-size: 13px; margin-bottom: 24px;">
+                {{ date_str }}
+            </div>
+
+            {% if top_news %}
+                <h2 style="font-size: 16px; color: #202124; border-bottom: 2px solid #1a73e8; padding-bottom: 4px; margin: 0 0 16px;">
+                    Top News
+                </h2>
+                {% for article in top_news %}
+                    <div style="margin-bottom: 24px;">
+                        <a href="{{ article.url }}"
+                           style="color: #1a73e8; text-decoration: none; font-size: 16px; font-weight: 600;">
+                            {{ article.headline }}
+                        </a>
+                        <div style="color: #5f6368; font-size: 12px; margin-top: 2px;">
+                            {{ article.source }}
+                        </div>
+                        <p style="color: #202124; font-size: 14px; line-height: 1.4; margin: 6px 0 0;">
+                            {{ article.summary }}
+                        </p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% for bucket in buckets %}
+                <h2 style="font-size: 16px; color: #202124; border-bottom: 1px solid #dadce0; padding-bottom: 4px; margin: 28px 0 12px;">
+                    {{ bucket.name }}
+                </h2>
+                <ul style="margin: 0; padding-left: 18px;">
+                    {% for article in bucket.articles %}
+                        <li style="margin-bottom: 8px;">
+                            <a href="{{ article.url }}"
+                               style="color: #1a73e8; text-decoration: none; font-size: 14px; font-weight: 600;">
+                                {{ article.headline }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+        
+            <div style="margin-top: 32px; padding-top: 16px; border-top: 1px solid #dadce0; color: #5f6368; font-size: 12px;">
+                <a href="{{ public_base_url }}/" style="color: #1a73e8; text-decoration: none;">View full archive</a>
+            </div>
+        </div>
+    </body>
+
+</html>

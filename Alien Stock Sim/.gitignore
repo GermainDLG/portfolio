@@ -1,0 +1,10 @@
+*.pyc
+0*.py
+.DS_Store
+venv
+my_env
+.idea
+.vscode
+.env
+dq.sqlite3
+config.ini

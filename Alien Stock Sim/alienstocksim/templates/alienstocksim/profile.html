@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% load static %}
+    <link href="{% static 'alienstocksim/theme.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'alienstocksim/profile.css' %}" rel="stylesheet" type="text/css">
+    <title>Profile — {{ profile_user.username }} · Alien Stock Sim</title>
+</head>
+<body class="app-body">
+    <div class="app-bg" aria-hidden="true"></div>
+    <div class="app-shell">
+        <header class="app-top">
+            <div class="app-top-inner">
+                <a href="{% url 'home' %}" class="app-brand">
+                    <span class="app-brand-mark" aria-hidden="true">👽</span>
+                    <span>Alien Stock Sim</span>
+                </a>
+                <nav class="app-nav-links" aria-label="Main">
+                    <a href="{% url 'home' %}" class="app-nav-link">Home</a>
+                    <a href="{% url 'profile' %}" class="app-nav-link app-nav-link--active">Profile</a>
+                    <a href="{% url 'messages_inbox' %}" class="app-nav-link nav-msg-link">
+                        Messages
+                        {% if has_unread_dm %}
+                        <span class="nav-unread-badge" title="{{ unread_dm_count }} unread" aria-label="{{ unread_dm_count }} unread direct message{{ unread_dm_count|pluralize }}"></span>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'account_logout' %}" class="app-nav-link app-nav-link--ghost">Logout</a>
+                </nav>
+            </div>
+        </header>
+
+        <div class="page-inner profile-page">
+            <div class="profile-header glass-panel card">
+                <div class="profile-header-row">
+                    <div>
+                        <p class="profile-kicker">{% if is_own_profile %}Your profile{% else %}Player{% endif %}</p>
+                        <h1>{{ profile_user.username }}</h1>
+                        <p class="profile-meta">
+                            {% if profile_user.get_full_name %}{{ profile_user.get_full_name }}{% else %}<span class="muted">No display name set</span>{% endif %}
+                        </p>
+                    </div>
+                    {% if not is_own_profile %}
+                    <div class="profile-actions">
+                        <form method="post" action="{% url 'follow_toggle' %}" class="follow-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="username" value="{{ profile_user.username }}">
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                            {% if is_following %}
+                            <button type="submit" name="action" value="unfollow" class="btn btn-secondary">Unfollow</button>
+                            {% else %}
+                            <button type="submit" name="action" value="follow" class="btn btn-primary">Follow</button>
+                            {% endif %}
+                        </form>
+                        {% if is_mutual %}
+                        <a href="{% url 'messages_thread' profile_user.username %}" class="btn btn-message">Message</a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="summary-section glass-panel card">
+                <h2>Account summary</h2>
+                <div class="summary-grid">
+                    <div class="summary-box">
+                        <h3>Liquid money</h3>
+                        <p class="summary-value">{{ liquid_money }}</p>
+                    </div>
+                    <div class="summary-box">
+                        <h3>Net worth</h3>
+                        <p class="summary-value">{{ net_worth }}</p>
+                    </div>
+                </div>
+            </div>
+
+            {% if is_own_profile %}
+            <div class="search-players glass-panel card">
+                <h2>Find players</h2>
+                <form method="get" action="{% url 'profile' %}" class="player-search-form">
+                    <input type="search" name="q" value="{{ search_query }}" placeholder="Search by username" class="player-search-input" autocomplete="off">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+                {% if search_query %}
+                <ul class="search-results">
+                    {% for u in search_results %}
+                    <li><a href="{% url 'profile_user' u.username %}">{{ u.username }}</a></li>
+                    {% empty %}
+                    <li class="muted">No matching users.</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <div class="holdings-section glass-panel card">
+                <h2>Stock holdings</h2>
+                <div class="table-scroll">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Shares held</th>
+                                <th>Price bought at</th>
+                                <th>Current price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for h in holdings %}
+                            <tr>
+                                <td>{{ h.company }}</td>
+                                <td>{{ h.quantity }}</td>
+                                <td>{{ h.bought_at_price }}</td>
+                                <td>{{ h.current_price }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="table-empty">No holdings yet. Trade from the home page.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bottom-grid">
+                <div class="friends-section glass-panel card">
+                    <h2>Followers</h2>
+                    <ul class="user-list">
+                        {% for row in followers_list %}
+                        <li><a href="{% url 'profile_user' row.username %}">{{ row.username }}</a></li>
+                        {% empty %}
+                        <li class="muted">No followers yet.</li>
+                        {% endfor %}
+                    </ul>
+                    <h3 class="subsection-title">Following</h3>
+                    <ul class="user-list">
+                        {% for row in following_list %}
+                        <li><a href="{% url 'profile_user' row.username %}">{{ row.username }}</a></li>
+                        {% empty %}
+                        <li class="muted">Not following anyone yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="leaderboard-section glass-panel card">
+                    <h2>Friends leaderboard</h2>
+                    <p class="leaderboard-hint">This player and everyone they follow, ranked by net worth.</p>
+                    <div class="table-scroll">
+                        <table class="data-table ranked-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-rank">Rank</th>
+                                    <th>Player</th>
+                                    <th>Net worth</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in friends_leaderboard %}
+                                <tr class="{% if row.is_highlight %}row-highlight{% endif %} {% if row.rank == 1 %}rank-1{% elif row.rank == 2 %}rank-2{% elif row.rank == 3 %}rank-3{% endif %}">
+                                    <td class="col-rank">{{ row.rank }}</td>
+                                    <td><a href="{% url 'profile_user' row.username %}">{{ row.username }}</a></td>
+                                    <td class="tabular">{{ row.net_worth }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="3" class="table-empty">No entries yet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'alienstocksim/dm_nav_badge.js' %}"></script>
+</body>
+</html>

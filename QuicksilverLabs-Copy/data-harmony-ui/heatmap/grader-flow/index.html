@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Concordia — Grader (Heatmap)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="topbar-title">
+        <div>
+          <div class="app-name">Concordia</div>
+        </div>
+      </div>
+      <div class="topbar-progress" id="grader-progress">
+        <!-- own progress fraction, filled by JS -->
+      </div>
+      <button class="schedule-btn" id="theme-toggle-btn" title="Switch color theme">
+        ☀ Light
+      </button>
+      <button class="schedule-btn" id="edit-schedule-btn" title="Update your free/busy availability">
+        📅 Edit Schedule
+      </button>
+      <button class="schedule-btn" id="reset-demo-btn" title="Clear all demo state and start over">
+        ↺ Reset Demo
+      </button>
+      <a class="schedule-btn switch-btn" href="../admin-flow/index.html" title="Open the admin dashboard">
+        ⇄ Admin
+      </a>
+    </header>
+
+    <div class="main">
+
+      <!-- Left sidebar: queue + bulk bar (single-pairing actions live in the popup) -->
+      <aside class="sidebar">
+
+        <div class="queue-header">
+          <span class="queue-title" id="queue-title">Table pairings</span>
+          <span class="badge" id="queue-count">0</span>
+          <button class="hist-btn" id="undo-btn" title="Undo" disabled>↺</button>
+          <button class="hist-btn" id="redo-btn" title="Redo" disabled>↻</button>
+          <span class="queue-hint" id="bulk-hint"></span>
+        </div>
+
+        <ul class="queue" id="queue-list"></ul>
+
+        <!-- Bulk bar (commit-box position): only visible with 2+ selections -->
+        <div class="action-box hidden" id="bulk-bar">
+          <div class="bulk-banner">Bulk mode — <span id="bulk-count">0</span> pairings selected</div>
+          <button class="submit-btn" id="bulk-continue-btn">Continue</button>
+        </div>
+      </aside>
+
+      <!-- Right detail panel (independently scrollable): the heatmap -->
+      <section class="detail-wrap">
+        <div class="detail" id="detail-panel"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Action popup: verdict dropdown + always-"Submit" submit button -->
+  <div class="modal-overlay hidden" id="action-modal">
+    <div class="modal action-modal">
+      <div class="modal-title" id="action-title">Review pairing</div>
+      <div class="modal-body action-modal-body">
+
+        <div class="action-row">
+          <select id="verdict-select" class="verdict-select" title="Verdict"></select>
+        </div>
+
+        <!-- Bulk mode: the pairings the decision applies to -->
+        <div class="hidden" id="bulk-list-wrap">
+          <p id="bulk-text"></p>
+          <ul class="modal-list" id="bulk-list"></ul>
+        </div>
+
+        <!-- Reassign picker (within the suggested table) -->
+        <div class="hidden" id="reassign-area"></div>
+
+        <!-- Expand mini-form (replaces message box when Expand selected) -->
+        <div class="subform hidden" id="expand-form">
+          <label class="field-label">Schema expansion</label>
+          <div class="radio-row">
+            <label><input type="radio" name="expand-kind" value="table" checked> New table</label>
+            <label><input type="radio" name="expand-kind" value="column"> New column</label>
+          </div>
+          <div id="expand-table-fields">
+            <input type="text" id="expand-table-name" placeholder="New table name">
+          </div>
+          <div id="expand-column-fields" class="hidden">
+            <select id="expand-target-table"></select>
+          </div>
+          <div class="expand-columns" id="expand-columns">
+            <!-- column rows injected by JS -->
+          </div>
+          <button class="mini-btn" id="add-column-btn" type="button">+ Add column</button>
+          <textarea id="expand-reason" class="message-box small" placeholder="Reason (required)"></textarea>
+        </div>
+
+        <!-- Message box: optional for accept/reject/reassign, required for assign-none -->
+        <textarea id="verdict-message" class="message-box"
+                  placeholder="Message (optional)"></textarea>
+
+        <div class="error hidden" id="action-error"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="action-cancel">Cancel</button>
+        <button class="btn primary" id="action-submit">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekly availability (When2Meet-style) -->
+  <div class="modal-overlay hidden" id="schedule-modal">
+    <div class="modal sched-modal">
+      <div class="modal-title">Your availability this week</div>
+      <div class="modal-body">
+        <p class="sched-hint">
+          Click or drag to mark the times you are <strong>free</strong> (green).
+          Unmarked boxes are treated as busy. Mon–Fri, 9:00 AM–5:00 PM, half-hour blocks.
+          No event details are shared — only free/busy.
+        </p>
+        <div class="sched-grid" id="schedule-grid"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="schedule-skip">Skip for now</button>
+        <button class="btn primary" id="schedule-save">Save schedule</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
