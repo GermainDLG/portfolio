@@ -38,7 +38,7 @@ export default function SolarSystem() {
 
 
     useEffect(() => {
-        fetch('/data/bodies.json')
+        fetch(`${import.meta.env.BASE_URL}data/bodies.json`)
         .then(response => response.json())
         .then(data => setPlanets(data));
     }, []);
