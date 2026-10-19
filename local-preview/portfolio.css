@@ -90,7 +90,7 @@ th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--bor
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
 /* Project previews and research gallery */
-.demo-preview { display: block; width: min(100%, 880px); margin: 24px 0; overflow: hidden; border: 1px solid var(--border); border-radius: 6px; background: var(--input); text-decoration: none; }
+.demo-preview { display: block; width: min(66.6667%, 586.67px); margin: 24px 0; overflow: hidden; border: 1px solid var(--border); border-radius: 6px; background: var(--input); text-decoration: none; }
 .demo-preview img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
 .demo-preview span { display: block; padding: 14px 18px; font-size: 14px; font-weight: 600; }
 .demo-preview:hover { border-color: var(--accent); }
@@ -104,3 +104,21 @@ th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--bor
 .graph-section figure { margin: 24px auto; max-width: 850px; }
 .graph-section img { display: block; width: 100%; height: auto; border: 1px solid var(--border); background: white; }
 .graph-section figcaption { margin-top: 12px; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+.project-heading, .project-doc-title { display: flex; flex-wrap: nowrap; width: 100%; justify-content: space-between; align-items: baseline; gap: 24px; }
+.project-heading h2 { margin-bottom: 0; }
+.project-heading { margin-bottom: 18px; }
+.project-date { margin-left: auto; flex: 0 0 auto; white-space: nowrap; text-align: right; font-size: 13px; color: var(--muted); letter-spacing: 0; font-weight: 400; }
+.project-doc-title { margin: 12px 0 3px; }
+.graph-nav { display: flex; flex-wrap: wrap; gap: 12px 24px; margin: 24px 0; }
+.graph-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.graph-grid figure { width: 100%; margin: 12px 0; }
+.graph-grid h3 { font-size: 18px; margin: 0 0 12px; }
+.graph-section > figure { max-width: 620px; }
+.graph-section { scroll-margin-top: 24px; }
+.graph-section p { max-width: 78ch; }
+@media (max-width: 760px) {
+  .graph-grid { grid-template-columns: 1fr; }
+  .project-heading { gap: 14px; }
+  .project-heading h2 { font-size: 18px; overflow-wrap: anywhere; }
+  .project-date { font-size: 11px; }
+}

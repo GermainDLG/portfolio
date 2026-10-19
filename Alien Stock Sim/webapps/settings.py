@@ -13,7 +13,7 @@ CONFIG = ConfigParser()
 CONFIG.read(BASE_DIR / "config.ini")
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = CONFIG.get("Django", "secret")
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY") or CONFIG.get("Django", "secret")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

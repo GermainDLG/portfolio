@@ -13,14 +13,12 @@ from alienstocksim.pricing import get_last_price
 import json
 import os
 from django.http import JsonResponse, FileResponse
-from google import genai
-from google.genai import types
 from django.conf import settings
 import time
 from django.db.utils import OperationalError
 
 # Needed to set as a client before making queries with gemini
-client = genai.Client()
+client = None
 
 def landing_action(request):
     if request.user.is_authenticated:
@@ -29,6 +27,13 @@ def landing_action(request):
 
 
 def generate_headline_batch():
+    if not getattr(settings, "AI_HEADLINES_ENABLED", True):
+        return []
+    from google import genai
+    from google.genai import types
+    global client
+    if client is None:
+        client = genai.Client()
     companies = ["Googlin", "Pear", "BenefitCo", "Fire Rage Inc."]
     
     prompt = f"""
@@ -222,7 +227,10 @@ def _friends_leaderboard_rows(profile, highlight_profile):
 def home_action(request):
     # Ensure this user has a Profile row so they appear on first visit (not only after /profile).
     Profile.objects.get_or_create(user=request.user)
-    context = {"leaderboard": _global_leaderboard_rows(request.user)}
+    context = {
+        "leaderboard": _global_leaderboard_rows(request.user),
+        "ai_headlines_enabled": getattr(settings, "AI_HEADLINES_ENABLED", True),
+    }
     return render(request, "alienstocksim/home.html", context)
 
 

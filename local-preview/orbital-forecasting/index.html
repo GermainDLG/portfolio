@@ -18,23 +18,39 @@
   <main id="main" class="gallery-main">
     <a class="text-link" href="../index.html#projects">Back to projects</a>
     <h1>Space / orbital forecasting</h1>
-    <p>Exploring orbital motion and how time-series models forecast it. These graphs come from the project’s notebook and forecasting script.</p>
-    <section class="graph-section" aria-labelledby="forecast-title">
-      <h2 id="forecast-title">Forecasting orbital radius</h2>
-      <p>Chronos-2 forecasts radius over time for four orbital eccentricities. Black is the observed context, blue is the actual future radius, and dashed orange is the model’s median forecast. The orange band spans its 10th to 90th percentile predictions. Each title includes the root mean square error.</p>
-      <figure><a href="../media/orbits/chronos-radius-forecast.png" target="_blank" rel="noopener"><img src="../media/orbits/chronos-radius-forecast.png" alt="Four Chronos-2 radius forecasts compared against actual orbital motion for eccentricities 0.1, 0.3, 0.5, and 0.7" width="1280" height="1280"></a><figcaption>Chronos-2 with 1,024 context samples and a 512-sample forecast. Click the graph to view the full image.</figcaption></figure>
+    <p>Exploring orbital motion and how time-series models forecast it. These graphs come from the project’s notebook and forecasting experiments.</p>
+    <nav class="graph-nav" aria-label="Graph experiments"><a href="#orbital-basics">Orbital basics</a><a href="#start-time">Start-time testing</a><a href="#velocity">Position and velocity</a><a href="#heatmaps">Eccentricity heatmaps</a></nav>
+    <section class="graph-section" id="orbital-basics" aria-labelledby="basics-title">
+      <h2 id="basics-title">How eccentricity works &amp; orbital radius over time</h2>
+      <p>Increasing eccentricity stretches a circular orbit into an ellipse and increases the variation in distance from the central body. These saved notebook outputs show the same orbits as paths and radius time series.</p>
+      <div class="graph-grid"><figure><h3>Orbital paths</h3><a href="../media/orbits/orbital-paths.png" target="_blank" rel="noopener"><img src="../media/orbits/orbital-paths.png" alt="Simulated orbital paths at eccentricities 0.1, 0.3, 0.5, and 0.7." loading="lazy" width="639" height="500"></a><figcaption>Simulated orbital paths at eccentricities 0.1, 0.3, 0.5, and 0.7. Click to enlarge.</figcaption></figure><figure><h3>Radius over time</h3><a href="../media/orbits/orbital-radius.png" target="_blank" rel="noopener"><img src="../media/orbits/orbital-radius.png" alt="Ground-truth orbital radius over time for the same four eccentricities." loading="lazy" width="613" height="624"></a><figcaption>Ground-truth orbital radius over time for the same four eccentricities. Click to enlarge.</figcaption></figure></div>
     </section>
-    <section class="graph-section" aria-labelledby="paths-title">
-      <h2 id="paths-title">How eccentricity changes an orbit</h2>
-      <p>Four simulated orbital paths share the same semi-major axis. Increasing eccentricity stretches the orbit into a more elongated ellipse.</p>
-      <figure><a href="../media/orbits/orbital-paths.png" target="_blank" rel="noopener"><img src="../media/orbits/orbital-paths.png" alt="Simulated elliptical orbital paths for eccentricities 0.1, 0.3, 0.5, and 0.7" loading="lazy" width="700" height="700"></a><figcaption>Original graph from the orbital exploration notebook.</figcaption></figure>
+    <section class="graph-section" id="start-time" aria-labelledby="start-title">
+      <h2 id="start-title">Start-time testing: Chronos and Moirai</h2>
+      <p>Forecast error across 100 sampled starting indices for each eccentricity. The scripts use their original configurations: Chronos-2 uses 1,024 context samples and a 512-sample forecast; Moirai-2 uses 512 and 64. These are side-by-side experiments with different horizons, not a controlled model ranking.</p>
+      <div class="graph-grid"><figure><h3>Chronos-2</h3><a href="../media/orbits/start-time-chronos.png" target="_blank" rel="noopener"><img src="../media/orbits/start-time-chronos.png" alt="Normalized forecast error versus start index across four eccentricities." loading="lazy" width="1262" height="943"></a><figcaption>Normalized forecast error versus start index across four eccentricities.</figcaption></figure><figure><h3>Moirai-2</h3><a href="../media/orbits/start-time-moirai.png" target="_blank" rel="noopener"><img src="../media/orbits/start-time-moirai.png" alt="Normalized forecast error versus start index across four eccentricities." loading="lazy" width="1261" height="943"></a><figcaption>Normalized forecast error versus start index across four eccentricities.</figcaption></figure></div>
     </section>
-    <section class="graph-section" aria-labelledby="radius-title">
-      <h2 id="radius-title">Orbital radius over time</h2>
-      <p>The same orbits viewed as time series: the radius rises and falls each revolution, with larger variation at higher eccentricity. These are simulated ground-truth series, before forecasting.</p>
-      <figure><a href="../media/orbits/orbital-radius.png" target="_blank" rel="noopener"><img src="../media/orbits/orbital-radius.png" alt="Ground-truth orbital radius plotted over time for four eccentricities" loading="lazy" width="700" height="700"></a><figcaption>Original graph from the orbital exploration notebook.</figcaption></figure>
+    <section class="graph-section" id="velocity" aria-labelledby="velocity-title">
+      <h2 id="velocity-title">Generate an orbit with velocity</h2>
+      <p>Chronos-2 forecasts position and velocity together, using 2,048 context samples and a 256-sample forecast at eccentricity 0.7. Black shows the observed context; dotted orange shows the forecast. This experiment has a Chronos result only.</p>
+      <figure><h3>Chronos-2</h3><a href="../media/orbits/velocity-chronos.png" target="_blank" rel="noopener"><img src="../media/orbits/velocity-chronos.png" alt="Predicted x/y orbital position and vx/vy velocity, shown together." loading="lazy" width="2219" height="1132"></a><figcaption>Predicted x/y orbital position and vx/vy velocity, shown together.</figcaption></figure>
+    </section>
+    <section class="graph-section" id="heatmaps" aria-labelledby="heatmaps-title">
+      <h2 id="heatmaps-title">Eccentricity heatmaps: Chronos and Moirai</h2>
+      <p>Normalized forecast error across eccentricities 0.05–0.95 and starting indices spaced by four samples. Chronos-2 uses 8,192 context samples and a 512-sample forecast; Moirai-2 uses 512 and 64. The original scripts use different color scaling; read each color bar independently.</p>
+      <div class="graph-grid"><figure><h3>Chronos-2</h3><a href="../media/orbits/heatmap-chronos.png" target="_blank" rel="noopener"><img src="../media/orbits/heatmap-chronos.png" alt="Forecast error across eccentricity and starting phase; original Chronos experiment." loading="lazy" width="1509" height="943"></a><figcaption>Forecast error across eccentricity and starting phase; original Chronos experiment.</figcaption></figure><figure><h3>Moirai-2</h3><a href="../media/orbits/heatmap-moirai.png" target="_blank" rel="noopener"><img src="../media/orbits/heatmap-moirai.png" alt="Forecast error across eccentricity and starting phase; original Moirai experiment." loading="lazy" width="1509" height="943"></a><figcaption>Forecast error across eccentricity and starting phase; original Moirai experiment.</figcaption></figure></div>
     </section>
   </main>
-  <footer><nav class="footer-nav" aria-label="Portfolio navigation"><a href="../index.html#projects">Projects</a><a href="../resume.pdf" target="_blank" rel="noopener">Portfolio</a></nav></footer>
+  <footer>
+    <nav class="footer-nav" aria-label="Social links and résumé">
+      <a class="social-link" href="https://github.com/GermainDLG" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in a new tab)">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 .75a11.25 11.25 0 0 0-3.56 21.92c.56.1.77-.24.77-.54v-2.1c-3.13.68-3.79-1.33-3.79-1.33-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.68.08-.68 1.13.08 1.72 1.16 1.72 1.16 1 1.72 2.63 1.22 3.27.93.1-.73.39-1.22.71-1.5-2.5-.29-5.13-1.25-5.13-5.56 0-1.23.44-2.23 1.16-3.02-.12-.28-.5-1.43.11-2.98 0 0 .95-.3 3.1 1.15a10.8 10.8 0 0 1 5.64 0c2.15-1.46 3.1-1.15 3.1-1.15.61 1.55.23 2.7.11 2.98.72.79 1.16 1.79 1.16 3.02 0 4.32-2.63 5.27-5.14 5.55.4.35.76 1.04.76 2.1v3.08c0 .3.2.65.78.54A11.25 11.25 0 0 0 12 .75Z"/></svg>
+      </a>
+      <a class="social-link" href="https://www.linkedin.com/in/davisgermain" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn (opens in a new tab)">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M20.45 2H3.55C2.69 2 2 2.68 2 3.52v16.96c0 .84.69 1.52 1.55 1.52h16.9c.86 0 1.55-.68 1.55-1.52V3.52c0-.84-.69-1.52-1.55-1.52ZM7.93 18.75H4.98V9.2h2.95v9.55ZM6.45 7.9a1.71 1.71 0 1 1 0-3.42 1.71 1.71 0 0 1 0 3.42Zm12.3 10.85H15.8V14.1c0-1.11-.02-2.54-1.55-2.54-1.55 0-1.79 1.21-1.79 2.46v4.73H9.51V9.2h2.83v1.3h.04c.39-.74 1.36-1.53 2.79-1.53 2.98 0 3.58 1.96 3.58 4.5v5.28Z"/></svg>
+      </a>
+      <a href="../resume.pdf" target="_blank" rel="noopener" aria-label="Resume — Davis Germain résumé PDF (opens in a new tab)">Resume</a>
+    </nav>
+  </footer>
 </body>
 </html>

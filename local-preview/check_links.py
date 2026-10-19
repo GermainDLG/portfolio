@@ -40,10 +40,10 @@ while queue:
                 child=urljoin(url,link).split('#')[0]
                 if urlsplit(child).netloc==urlsplit(BASE).netloc and child not in seen:
                     queue.append(child)
-with opener.open(urljoin(BASE,'star-explorer/data/bodies.json'),timeout=10) as r:
+with opener.open(urljoin(BASE,'beyondmaps/data/bodies.json'),timeout=10) as r:
     import json
     assert len(json.load(r)) > 0
-print(f'PASS: {len(seen)} local pages, project links, stylesheets, scripts, images, and PDFs returned HTTP 200; StarExplorer planet dataset loads.')
+print(f'PASS: {len(seen)} local pages, project links, stylesheets, scripts, images, and PDFs returned HTTP 200; BeyondMaps planet dataset loads.')
 
 if static_server:
     static_server.shutdown()

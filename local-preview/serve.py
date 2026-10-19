@@ -1,5 +1,7 @@
 """Serve only portfolio preview assets on localhost; no project source is modified."""
 import argparse
+import sys
+sys.dont_write_bytecode = True
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
@@ -7,14 +9,14 @@ from prepare import prepare
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
-STAR = ROOT / "StarExplorer/star-explorer/explorer/dist"
+BEYONDMAPS = HERE / "beyondmaps"
 MOUNTS = {
     "/media/": (HERE / "media", {".png", ".jpg", ".webp", ".svg"}),
     "/orbital-forecasting/": (HERE / "orbital-forecasting", {".html"}),
-    "/star-explorer/": (STAR, {".html", ".css", ".js", ".json", ".svg", ".png", ".jpg", ".webp"}),
-    # The existing StarExplorer build uses root-relative asset/data URLs.
-    "/assets/": (STAR / "assets", {".css", ".js", ".png", ".jpg", ".svg", ".webp"}),
-    "/data/": (STAR / "data", {".json"}),
+    "/beyondmaps/": (BEYONDMAPS, {".html", ".css", ".js", ".json", ".svg", ".png", ".jpg", ".webp"}),
+    # The existing BeyondMaps build uses root-relative asset/data URLs.
+    "/assets/": (BEYONDMAPS / "assets", {".css", ".js", ".png", ".jpg", ".svg", ".webp"}),
+    "/data/": (BEYONDMAPS / "data", {".json"}),
     "/data-harmony/": (ROOT / "QuicksilverLabs-Copy/data-harmony-ui", {".html", ".css", ".js"}),
     "/documents/": (ROOT / "Design of AI Products", {".pdf"}),
     "/stock-documents/": (ROOT / "Alien Stock Sim", {".pdf"}),
@@ -25,11 +27,12 @@ EXACT = {
     "/portfolio.css": HERE / "portfolio.css",
     "/portfolio.js": HERE / "portfolio.js",
     "/portrait.jpg": HERE / "portrait.jpg",
+    "/portfolio_image.jpg": HERE / "portfolio_image.jpg",
     "/resume.pdf": HERE / "resume.pdf",
     "/newsletter-preview/index.html": HERE / "newsletter-preview/index.html",
     "/newsletter-preview/": ROOT / "QuicksilverLabs-Copy/newsletter-filter/digest_dryrun.html",
-    "/favicon.svg": STAR / "favicon.svg",
-    "/icons.svg": STAR / "icons.svg",
+    "/favicon.svg": BEYONDMAPS / "favicon.svg",
+    "/icons.svg": BEYONDMAPS / "icons.svg",
 }
 
 
@@ -60,8 +63,8 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=8080)
     args = parser.parse_args()
     prepare()
-    if not (STAR / "index.html").is_file():
-        print("Note: StarExplorer's production build is missing; its preview will be unavailable.")
+    if not (BEYONDMAPS / "index.html").is_file():
+        print("Note: BeyondMaps's production build is missing; its preview will be unavailable.")
     server = ThreadingHTTPServer(("127.0.0.1", args.port), PreviewHandler)
     print(f"Portfolio preview: http://localhost:{args.port}", flush=True)
     print("Press Ctrl+C to stop.", flush=True)

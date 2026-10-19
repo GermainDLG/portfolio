@@ -8,3 +8,6 @@ my_env
 .env
 dq.sqlite3
 config.ini
+.portfolio-venv/
+.portfolio-secret
+portfolio.sqlite3*

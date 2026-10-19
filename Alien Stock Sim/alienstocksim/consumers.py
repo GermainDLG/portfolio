@@ -8,6 +8,7 @@ from alienstocksim.views import generate_headline_batch
 from alienstocksim.pricing import set_last_price, TRADE_COMPANY, get_last_price
 from alienstocksim.models import NewsItem, PriceCache, StockEntry
 from django.db.models import Sum
+from django.conf import settings
 
 # Getting the global channel layer
 from channels.layers import get_channel_layer
@@ -40,8 +41,12 @@ class StockConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add("news_feed", self.channel_name)
         StockConsumer.connected_count += 1
         # Start a background task to send headline data only if there isn't one
-        if StockConsumer.headline_task == None:
+        if getattr(settings, "AI_HEADLINES_ENABLED", True) and StockConsumer.headline_task is None:
             StockConsumer.headline_task = asyncio.create_task(self.send_headline_data())
+
+        if getattr(settings, "PORTFOLIO_DEMO", False):
+            if StockConsumer.stock_task is None or StockConsumer.stock_task.done():
+                StockConsumer.stock_task = asyncio.create_task(self.send_stock_data())
 
         # Filters the cache for datapoint of the current companty
         cache = await asyncio.to_thread(
@@ -79,6 +84,10 @@ class StockConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard("news_feed", self.channel_name)
         StockConsumer.connected_count -= 1
         self.running = False
+        if getattr(settings, "PORTFOLIO_DEMO", False) and StockConsumer.connected_count == 0:
+            if StockConsumer.stock_task is not None:
+                StockConsumer.stock_task.cancel()
+                StockConsumer.stock_task = None
 
     # Sending stock data
     async def send_stock_data(self, interval=10): 
@@ -205,13 +214,16 @@ class StockConsumer(AsyncWebsocketConsumer):
     # Returns Real Stock Data
     # The api in use if alpha vantage
     async def get_stock_price(self, symbol):
+        api_key = getattr(settings, "ALPHA_VANTAGE_API_KEY", None)
+        if getattr(settings, "PORTFOLIO_DEMO", False) and not api_key:
+            return 0.0
         url = "https://www.alphavantage.co/query"
         params = {
             "function": "GLOBAL_QUOTE",
             "symbol": symbol,
-            "apikey": "D1PBWCAD52UWQ786"
+            "apikey": api_key or "D1PBWCAD52UWQ786"
         }
-        response = await asyncio.to_thread(requests.get, url, params=params)
+        response = await asyncio.to_thread(requests.get, url, params=params, timeout=10)
         data = response.json()
         pct_str = data["Global Quote"]["10. change percent"] # We only need the percent change
         return float(pct_str.strip("%"))

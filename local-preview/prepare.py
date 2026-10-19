@@ -18,7 +18,7 @@ def copy_public(source, destination, extensions=TYPES):
     return count
 
 def prepare():
-    count = copy_public(ROOT / 'StarExplorer/star-explorer/explorer/dist', HERE / 'star-explorer')
+    count = copy_public(ROOT / 'BeyondMaps/beyondmaps/explorer/dist', HERE / 'beyondmaps')
     for variant in ['github-basic', 'github-recommended', 'github-table', 'popup-action', 'table-vs-column', 'heatmap']:
         count += copy_public(ROOT / 'QuicksilverLabs-Copy/data-harmony-ui' / variant, HERE / 'data-harmony' / variant, {'.html', '.css', '.js'})
     count += copy_public(ROOT / 'Design of AI Products', HERE / 'documents', {'.pdf'})

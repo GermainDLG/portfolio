@@ -73,7 +73,7 @@
                         </div>
                     </div>
                     <div class="news_feed" id="news_feed">
-                        <div class="news_placeholder">Loading headlines…</div>
+                        {% if ai_headlines_enabled %}<div class="news_placeholder">Loading headlines…</div>{% endif %}
                     </div>
                 </div>
 

@@ -26,3 +26,37 @@ if '--forecast' in sys.argv:
         print('Saved Chronos-2 forecast plot from the original script.', flush=True)
     plt.show = save_forecast
     runpy.run_path(str(SPACE / 'scripts/radius/single_wave_chronos.py'), run_name='__main__')
+
+if '--experiments' in sys.argv:
+    os.environ['MPLBACKEND'] = 'Agg'
+    os.environ['HF_HUB_OFFLINE'] = '1'
+    sys.path.insert(0, str(SPACE))
+    import importlib.util
+    import matplotlib.pyplot as plt
+    jobs = [
+        ('radius/start_time_testing_chronos.py', 'start-time-chronos', 'Chronos-2 · start-time testing'),
+        ('radius/start_time_testing_moirai.py', 'start-time-moirai', 'Moirai-2 · start-time testing'),
+        ('XYPairs/generate_orbit_with_velocity_chronos.py', 'velocity-chronos', 'Chronos-2 · position and velocity'),
+        ('radius/eccentricity_heatmap_chronos.py', 'heatmap-chronos', 'Chronos-2 · eccentricity heatmap'),
+        ('radius/eccentricity_heatmap_moirai.py', 'heatmap-moirai', 'Moirai-2 · eccentricity heatmap'),
+    ]
+    for script, filename, title in jobs:
+        if '--only' in sys.argv and filename != sys.argv[sys.argv.index('--only') + 1]:
+            continue
+        output = OUT / f'{filename}.png'
+        if output.exists():
+            print(f'Already exported: {filename}', flush=True)
+            continue
+        print(f'Running original experiment: {script}', flush=True)
+        spec = importlib.util.spec_from_file_location(filename.replace('-', '_'), SPACE / 'scripts' / script)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        def save_experiment(output=output, title=title):
+            fig = plt.gcf()
+            fig.suptitle(title)
+            fig.tight_layout()
+            fig.savefig(output, dpi=160, bbox_inches='tight')
+            plt.close(fig)
+            print(f'Saved {output.name}', flush=True)
+        plt.show = save_experiment
+        module.main()
