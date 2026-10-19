@@ -49,7 +49,7 @@ python .\local-preview\prepare.py
   (Spring 2026 and Fall 2025), and the requested Summer 2026 Quicksilver dates.
   October import commits were not used as project dates.
 - The newsletter is a saved digest. MazeInteractive remains a desktop application.
-- Alien Stock Sim has a separate local launcher; see `../Alien Stock Sim/PORTFOLIO.md`.
+- Alien Stock Sim links to `stock-simulator/index.html`, a browser adaptation with simulated prices, trading, and local browser persistence. The original Django application has a separate local launcher; see `../Alien Stock Sim/PORTFOLIO.md`.
 
 ## Orbital graph gallery
 
@@ -85,7 +85,7 @@ random seeds, model choices, and color scales. It does not invent or interpolate
   URL in `index.html`. Replace that file to update your photo.
 - **Pages:** About Me and Projects use `#about` and `#projects`; `#contact` jumps to the
   About Me contact section. Browser Back and direct links are supported.
-- **Contact:** Fields validate in the browser; submission does not send or store messages.
+- **Contact:** Fields validate in the browser; submission opens a prefilled email to davisgermain621@gmail.com in the visitor's email app. The visitor sends it there. A direct email link is also provided.
 
 ## Check local links
 

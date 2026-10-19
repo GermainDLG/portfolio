@@ -16,6 +16,15 @@ function showPage() {
 window.addEventListener('hashchange', showPage);
 contactSection.querySelector('form').addEventListener('submit', event => {
   event.preventDefault();
-  contactSection.querySelector('.form-status').textContent = 'Thanks for stopping by! This form is a preview, so your message hasn’t been sent.';
+  const form = event.currentTarget;
+  if (!form.reportValidity()) return;
+  const fields = new FormData(form);
+  const name = fields.get('name').trim();
+  const email = fields.get('email').trim();
+  const message = fields.get('message').trim();
+  const subject = 'Portfolio message from ' + name;
+  const body = `Name: ${name}\r\nEmail: ${email}\r\n\r\n${message}`;
+  window.location.href = `mailto:davisgermain621@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  contactSection.querySelector('.form-status').textContent = 'Your email app should open with your message ready. Press Send there to contact me. If nothing opens, email davisgermain621@gmail.com directly.';
 });
 showPage();

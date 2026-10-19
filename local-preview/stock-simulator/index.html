@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alien Stock Sim — Browser demo</title>
+  <link rel="stylesheet" href="./simulator.css"><script src="./simulator.js" defer></script>
+</head>
+<body>
+<header><a href="../index.html#projects">← Portfolio</a><span>👽 Alien Stock Sim</span></header>
+<main>
+  <h1>Your interstellar trading desk</h1>
+  <p>Browser demo of Alien Stock Sim. Trade fictional companies with $10,000 in virtual cash. Prices are randomly simulated every 10 seconds; no real money or market data is used.</p>
+  <section class="summary" aria-label="Your portfolio">
+    <div>Available cash<strong id="cash"></strong></div><div>Stock value<strong id="holdings"></strong></div><div>Net worth<strong id="worth"></strong></div>
+  </section>
+  <div class="grid">
+    <section class="panel"><h2>Market</h2><label>Company <select id="company"></select></label>
+      <p class="quote"><strong id="price"></strong> <span id="change"></span></p>
+      <svg id="chart" viewBox="0 0 600 220" role="img" aria-labelledby="chart-title"><title id="chart-title">Simulated price history</title><path id="line" fill="none" stroke="#7de4cf" stroke-width="3"/></svg>
+      <p id="range"></p><p id="position"></p>
+      <form id="trade"><label>Number of shares <input id="quantity" type="number" min="1" max="1000000" step="1" value="1" required></label>
+        <p id="estimate"></p><div class="buttons"><button type="submit" name="side" value="buy">Buy shares</button><button type="submit" name="side" value="sell">Sell shares</button></div>
+      </form><p id="status" role="status"></p>
+    </section>
+    <section class="panel"><h2>Recent trades</h2><ol id="history"></ol><p id="empty">Your trades will appear here.</p></section>
+  </div>
+  <p id="storage">Progress is saved in this browser. Accounts, shared leaderboards, and messaging are available only in the original server application.</p>
+  <button id="reset" class="secondary">Reset demo</button>
+</main>
+</body></html>
