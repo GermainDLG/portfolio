@@ -19,7 +19,6 @@ MOUNTS = {
     "/data/": (BEYONDMAPS / "data", {".json"}),
     "/data-harmony/": (ROOT / "QuicksilverLabs-Copy/data-harmony-ui", {".html", ".css", ".js"}),
     "/documents/": (ROOT / "Design of AI Products", {".pdf"}),
-    "/stock-documents/": (ROOT / "Alien Stock Sim", {".pdf"}),
 }
 EXACT = {
     "/": HERE / "index.html",

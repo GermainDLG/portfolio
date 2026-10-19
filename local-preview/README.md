@@ -22,8 +22,7 @@ Do not open the HTML as a `file://` URL: BeyondMaps needs HTTP to load its plane
 python .\local-preview\prepare.py
 ```
 
-This copies the BeyondMaps build, six table-pairing prototypes, design PDFs, two stock-simulator
-PDFs, and saved newsletter digest into the corresponding folders inside `local-preview`.
+This copies the BeyondMaps build, six table-pairing prototypes, design PDFs and saved newsletter digest into the corresponding folders inside `local-preview`.
 It copies only the selected public files, excluding source credentials, environments, and application data.
 Re-run this after changing the underlying projects; the Python launcher also runs it automatically.
 These exported files are part of the static portfolio and should be included when serving it elsewhere.
@@ -49,7 +48,6 @@ python .\local-preview\prepare.py
   (Spring 2026 and Fall 2025), and the requested Summer 2026 Quicksilver dates.
   October import commits were not used as project dates.
 - The newsletter is a saved digest. MazeInteractive remains a desktop application.
-- Alien Stock Sim links to `stock-simulator/index.html`, a browser adaptation with simulated prices, trading, and local browser persistence. The original Django application has a separate local launcher; see `../Alien Stock Sim/PORTFOLIO.md`.
 
 ## Orbital graph gallery
 

@@ -22,11 +22,6 @@ def prepare():
     for variant in ['github-basic', 'github-recommended', 'github-table', 'popup-action', 'table-vs-column', 'heatmap']:
         count += copy_public(ROOT / 'QuicksilverLabs-Copy/data-harmony-ui' / variant, HERE / 'data-harmony' / variant, {'.html', '.css', '.js'})
     count += copy_public(ROOT / 'Design of AI Products', HERE / 'documents', {'.pdf'})
-    for filename in ['Spec Document.pdf', 'Sprint #1 Presentation.pdf']:
-        target = HERE / 'stock-documents' / filename
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(ROOT / 'Alien Stock Sim' / filename, target)
-        count += 1
     target = HERE / 'newsletter-preview/index.html'
     target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(ROOT / 'QuicksilverLabs-Copy/newsletter-filter/digest_dryrun.html', target)
