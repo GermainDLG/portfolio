@@ -1,4 +1,4 @@
-/* ===== Data Harmony — Grader flow (Table vs Column) =====
+/* ===== [REDACTED] — Grader flow (Table vs Column) =====
  * Based on github-table, plus:
  *  - Decluttered detail panel (no sample values / match details) and queue
  *    rows (no target subtext).

@@ -1,4 +1,4 @@
-/* ===== Data Harmony — Admin flow (Table vs Column) =====
+/* ===== [REDACTED] — Admin flow (Table vs Column) =====
  * Based on github-table, plus:
  *  - Decluttered detail panel (no sample values / match details) and queue
  *    rows (no target subtext).

@@ -1,4 +1,4 @@
-/* ===== Data Harmony — Admin flow =====
+/* ===== [REDACTED] — Admin flow =====
  * Modular POC. CONFIG isolates the pieces expected to change next phase
  * (confidence buckets, reason modes, grader cap).
  */

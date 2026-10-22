@@ -1,4 +1,4 @@
-/* ===== Data Harmony — Grader flow =====
+/* ===== [REDACTED] — Grader flow =====
  * Modular POC. Config-driven pieces (confidence buckets, reasons, verdicts)
  * are isolated in CONFIG so the next phase (9 confidence buckets,
  * constrained reason lists) is a data change, not a redesign.
