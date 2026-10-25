@@ -77,13 +77,15 @@ random seeds, model choices, and color scales. It does not invent or interpolate
 ## Editing the design
 
 - **Colors:** Edit the marked `:root` palette at the top of `portfolio.css`.
-- **Font:** The shared font is Google Sans Code, loaded from Google Fonts; monospace is the fallback.
+- **Font:** Google Sans Code remains the shared heading/accent font. About Me uses Segoe UI/Arial for readable body text.
 - **About text:** Edit the `intro-copy` paragraphs in `index.html`.
 - **Portrait:** The image is `local-preview/portfolio_image.jpg`, referenced with a relative
   URL in `index.html`. Replace that file to update your photo.
 - **Pages:** About Me and Projects use `#about` and `#projects`; `#contact` jumps to the
   About Me contact section. Browser Back and direct links are supported.
-- **Contact:** Fields validate in the browser; submission opens a prefilled email to davisgermain621@gmail.com in the visitor's email app. The visitor sends it there. A direct email link is also provided.
+- **Contact:** A direct email link opens the visitor's email app; the address is also selectable text. GitHub and LinkedIn links open in new tabs.
+- **Resumes:** The three PDFs under `resumes/` are the approved October 24, 2026 files provided from `Desktop/Current Resume`: `F26 UX_Design Resume.pdf` → `design.pdf`, `F26 UX Research Resume.pdf` → `research.pdf`, and `F26 PM Resume.pdf` → `product-and-project.pdf`. Resume links open in new tabs, with accessible names announcing that behavior. The old generic `resume.pdf` is no longer linked from About Me.
+- **Selected work:** Links use the existing `#harmony-title` and `#research-title` destinations on Projects. The student AI study preview is omitted until a published destination exists.
 
 ## Check local links
 

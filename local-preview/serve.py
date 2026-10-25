@@ -11,6 +11,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 BEYONDMAPS = HERE / "beyondmaps"
 MOUNTS = {
+    "/resumes/": (HERE / "resumes", {".pdf"}),
     "/media/": (HERE / "media", {".png", ".jpg", ".webp", ".svg"}),
     "/orbital-forecasting/": (HERE / "orbital-forecasting", {".html"}),
     "/beyondmaps/": (BEYONDMAPS, {".html", ".css", ".js", ".json", ".svg", ".png", ".jpg", ".webp"}),
@@ -18,7 +19,7 @@ MOUNTS = {
     "/assets/": (BEYONDMAPS / "assets", {".css", ".js", ".png", ".jpg", ".svg", ".webp"}),
     "/data/": (BEYONDMAPS / "data", {".json"}),
     "/data-harmony/": (ROOT / "QuicksilverLabs-Copy/data-harmony-ui", {".html", ".css", ".js"}),
-    "/documents/": (ROOT / "Design of AI Products", {".pdf"}),
+    "/documents/": (HERE / "documents", {".pdf", ".mp4"}),
 }
 EXACT = {
     "/": HERE / "index.html",
